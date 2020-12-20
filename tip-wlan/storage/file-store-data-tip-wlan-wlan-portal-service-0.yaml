@@ -1,0 +1,12 @@
+# file-store-data-tip-wlan-wlan-portal-service-0
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: file-store-data-tip-wlan-wlan-portal-service-0
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: ""
+  resources:
+    requests:
+      storage: 100Gi
