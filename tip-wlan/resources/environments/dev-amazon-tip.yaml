@@ -4,7 +4,7 @@
 # It can be tweaked, based on the need to support different
 # dev environments.
 # This file expects to have a GlusterFS storage solution running
-# before "helm install" is performed. 
+# before "helm install" is performed.
 #################################################################
 # Global configuration overrides.
 #
@@ -29,9 +29,7 @@ global:
   debugEnabled: true
 
 # Annotations for namespace
-annotations: {
-    "helm.sh/resource-policy": keep
-}
+annotations: { "helm.sh/resource-policy": keep }
 
 #createReleaseNamespace: false
 
@@ -47,21 +45,29 @@ common:
   efs-provisioner:
     enabled: true
     provisioner:
-      efsFileSystemId: fs-49a5104c
-      awsRegion: us-west-2
-      efsDnsName: fs-49a5104c.efs.us-west-2.amazonaws.com
-      storageClass: aws-efs  
+      efsFileSystemId: fs-967801ee
+      awsRegion: us-east-2
+      efsDnsName: fs-967801ee.efs.us-east-2.amazonaws.com
+      storageClass: aws-efs
 opensync-gw-cloud:
+  service:
+    type: LoadBalancer
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: wlan-filestore.tip.net-bot.com,opensync-controller.tip.net-bot.com,opensync-redirector.tip.net-bot.com
   enabled: true
   externalhost:
     address:
-      ovsdb: opensync-controller.demo.lab.wlan.tip.build
-      mqtt: opensync-mqtt-broker.demo.lab.wlan.tip.build
+      ovsdb: opensync-controller.tip.net-bot.com
+      mqtt: opensync-mqtt-broker.tip.net-bot.com
   persistence:
     enabled: false
   filestore:
-    url: "https://wlan-filestore.demo.lab.wlan.tip.build"
+    url: "https://wlan-filestore.tip.net-bot.com"
 opensync-mqtt-broker:
+  service:
+    type: LoadBalancer
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: opensync-mqtt-broker.tip.net-bot.com
   enabled: true
   replicaCount: 1
   persistence:
@@ -70,24 +76,55 @@ opensync-mqtt-broker:
 wlan-cloud-graphql-gw:
   enabled: true
   env:
-    portalsvc: wlan-portal-svc.demo.lab.wlan.tip.build
+    portalsvc: tip-wlan-wlan-portal-service:9051
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    hosts:
+      - host: wlan-graphql.tip.net-bot.com
+        paths: [/]
 wlan-cloud-static-portal:
   enabled: true
   env:
-    graphql: https://wlan-graphql.demo.lab.wlan.tip.build
+    graphql: http://wlan-graphql.tip.net-bot.com
   ingress:
+    annotations:
+      kubernetes.io/ingress.class: nginx
     hosts:
-      - host: wlan-ui.demo.lab.wlan.tip.build
-        paths: [
-           /
-          ]
+      - host: wlan-ui.tip.net-bot.com
+        paths: [/]
 wlan-portal-service:
   enabled: true
   persistence:
     enabled: true
     storageClass: aws-efs
     filestoreSize: 10Gi
+  service:
+    type: LoadBalancer
+    annotations:
+      external-dns.alpha.kubernetes.io/hostname: wlan-portal-svc.tip.net-bot.com
+  # --------
+  # ingress:
+  #   enabled: true
+  #   tls: false
+  #   annotations:
+  #     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+  #     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+  #     kubernetes.io/ingress.class: nginx
+  #   hosts:
+  #     - host: wlan-portal-svc.tip.net-bot.com
+  #       paths: [/]
+  # --------
+  # tls:
+  #   - hosts:
+  #       - wlan-portal-svc.tip.net-bot.com
+  # - secretName: portal-secret
 wlan-prov-service:
+  # service:
+  #   # type: NodePort
+  #   type: LoadBalancer
+  #   annotations:
+  #     external-dns.alpha.kubernetes.io/hostname: wlan-portal-svc.tip.net-bot.com
   enabled: true
   creds:
     enabled: true
@@ -99,15 +136,20 @@ wlan-prov-service:
     schema_repo:
       username: tip-read
       password: tip-read
+    postgres:
+      singleDataSourceUsername: tip_user
+      singleDataSourcePassword: tip_password
+      singleDataSourceSslKeyPassword: mypassword
 wlan-ssc-service:
   enabled: true
   creds:
+    enabled: true
     sslKeyPassword: mypassword
     sslKeystorePassword: mypassword
     sslTruststorePassword: mypassword
     cassandra:
-      tip_user: tip_user
-      tip_password: tip_password 
+      tip_user: cassandra
+      tip_password: cassandra
     schema_repo:
       username: tip-read
       password: tip-read
@@ -122,13 +164,17 @@ wlan-port-forwarding-gateway-service:
   creds:
     websocketSessionTokenEncKey: MyToKeN0MyToKeN1
   externallyVisible:
-    host: api.wlan.demo.lab.wlan.tip.build
+    host: api.wlan.tip.net-bot.com
     port: 30401
 nginx-ingress-controller:
   enabled: true
   controller:
+    service:
+      type: LoadBalancer
+      annotations:
+        external-dns.alpha.kubernetes.io/hostname: api.wlan.tip.net-bot.com
     config:
-      externalStatusAddress: "api.wlan.demo.lab.wlan.tip.build"
+      externalStatusAddress: "api.wlan.tip.net-bot.com"
 zookeeper:
   enabled: true
   replicaCount: 1
@@ -149,6 +195,9 @@ cassandra:
   persistence:
     enabled: true
     storageClass: "gp2"
+  dbUser:
+    user: cassandra
+    password: cassandra
   resources:
     requests:
       cpu: 500m
@@ -159,11 +208,11 @@ cassandra:
 postgresql:
   enabled: true
   postgresqlPassword: postgres
-## NOTE: If we are using glusterfs as Storage class, we don't really need 
-## replication turned on, since the data is anyway replicated on glusterfs nodes
-## Replication is useful: 
-## a. When we use HostPath as storage mechanism
-## b. If master goes down and one of the slave is promoted as master
+  ## NOTE: If we are using glusterfs as Storage class, we don't really need
+  ## replication turned on, since the data is anyway replicated on glusterfs nodes
+  ## Replication is useful:
+  ## a. When we use HostPath as storage mechanism
+  ## b. If master goes down and one of the slave is promoted as master
   replication:
     enabled: true
     slaveReplicas: 1

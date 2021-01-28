@@ -21,6 +21,7 @@
 ;; If Cassandra has auth enabled, fill out these options
 username = cassandra 
 password = cassandra
+
 ; keyspace = ks1
 
 

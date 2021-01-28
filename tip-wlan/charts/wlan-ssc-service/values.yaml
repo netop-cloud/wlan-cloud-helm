@@ -25,7 +25,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name:
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
 ## Liveness and Readiness probe values.
@@ -47,7 +48,8 @@ probes:
     failureThreshold: 3
     scheme: HTTPS
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -81,26 +83,26 @@ scalability:
   #max number of persistent connections in the http client pool per destination
   tip_wlan_httpClientConfig_maxConnectionsPerRoute: 10
   #max number of concurrent REST API calls a single instance of this service can process
-  tip_wlan_maxHttpThreads:  100
+  tip_wlan_maxHttpThreads: 100
   #memory tuning parameters for the JVM - max size, initialsize, garbage collection tuning options, etc.
   JVM_MEM_OPTIONS: " "
 
 ingress:
   enabled: false
-  annotations: {}
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: example.com
-      paths: [
-         /portal
-        ]
+      paths: [/portal]
   tls:
-   - secretName: portal-secret
-     hosts:
-       - example.com
+    - secretName: portal-secret
+      hosts:
+        - example.com
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -120,12 +122,12 @@ affinity: {}
 
 creds:
   enabled: true
-  sslKeyPassword: DUMMY_PASSWORD
-  sslKeystorePassword: DUMMY_PASSWORD
-  sslTruststorePassword: DUMMY_PASSWORD
+  sslKeyPassword: mypassword
+  sslKeystorePassword: mypassword
+  sslTruststorePassword: mypassword
   cassandra:
-    tip_user: DUMMY_TIP_USERNAME
-    tip_password: DUMMY_TIP_USERS_PASSWORD
+    tip_user: tip_user
+    tip_password: tip_password
   schema_repo:
     username: DUMMY_SCHEMA_REPO_USERNAME
     password: DUMMY_SCHEMA_REPO_PASSWORD

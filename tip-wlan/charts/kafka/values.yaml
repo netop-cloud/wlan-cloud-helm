@@ -10,7 +10,7 @@ image: "confluentinc/cp-kafka"
 # image: "wurstmeister/kafka"
 
 ## The kafka image tag
-imageTag: "5.0.1"  # Confluent image for Kafka 2.0.0
+imageTag: "5.0.1" # Confluent image for Kafka 2.0.0
 # imageTag: "latest"
 
 ## Specify a imagePullPolicy
@@ -19,7 +19,8 @@ imagePullPolicy: "IfNotPresent"
 
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-resources: {}
+resources:
+  {}
   # limits:
   #   cpu: 200m
   #   memory: 1536Mi
@@ -53,7 +54,6 @@ podManagementPolicy: OrderedReady
 #     - user
 #     - pass
 #   mountPath: /opt/zookeeper/secret
-
 
 ## The subpath within the Kafka container's PV where logs will be stored.
 ## This is combined with `persistence.mountPath`, to create, by default: /opt/kafka/data/logs
@@ -166,11 +166,13 @@ external:
 podAnnotations: {}
 
 # Labels to be added to Kafka pods
-podLabels: {}
+podLabels:
+  {}
   # service: broker
   # team: developers
 
-podDisruptionBudget: {}
+podDisruptionBudget:
+  {}
   # maxUnavailable: 1  # Limits how many Kafka pods may be unavailable due to voluntary disruptions.
 
 ## Configuration Overrides. Specify any Kafka settings you would like set on the StatefulSet
@@ -178,7 +180,7 @@ podDisruptionBudget: {}
 ## ref: https://kafka.apache.org/documentation/#brokerconfigs
 ##
 configurationOverrides:
-  "confluent.support.metrics.enable": false  # Disables confluent metric submission
+  "confluent.support.metrics.enable": false # Disables confluent metric submission
   # "auto.leader.rebalance.enable": true
   # "auto.create.topics.enable": true
   # "controlled.shutdown.enable": true
@@ -222,7 +224,6 @@ configurationOverrides:
 ## set extra ENVs
 #   key: "value"
 envOverrides: {}
-
 
 ## A collection of additional ports to expose on brokers (formatted as normal containerPort yaml)
 # Useful when the image exposes metrics (like prometheus, etc.) through a javaagent instead of a sidecar
@@ -305,7 +306,6 @@ topics:
   #         - Write
   #     - user: all
   #       operations: [ All ]
-
   ## Enable/disable the chart's tests.  Useful if using this chart as a dependency of
   ## another chart and you don't want these tests running when trying to develop and
   ## test your own chart.
@@ -346,7 +346,7 @@ zookeeper:
   ## Pod scheduling preferences (by default keep pods within a release on separate nodes).
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   ## By default we don't set affinity:
-  affinity: {}  # Criteria by which pod label-values influence scheduling for zookeeper pods.
+  affinity: {} # Criteria by which pod label-values influence scheduling for zookeeper pods.
   # podAntiAffinity:
   #   requiredDuringSchedulingIgnoredDuringExecution:
   #     - topologyKey: "kubernetes.io/hostname"
@@ -355,9 +355,9 @@ zookeeper:
   #           release: zookeeper
 
 creds:
-  sslTruststorePassword: DUMMY_PASSWORD
-  sslKeystorePassword: DUMMY_PASSWORD
-  sslKeyPassword: DUMMY_PASSWORD
+  sslTruststorePassword: mypassword
+  sslKeystorePassword: mypassword
+  sslKeyPassword: mypassword
 
 kafka:
   url: kafka-headless

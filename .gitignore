@@ -3,3 +3,4 @@
 *.pkcs12
 *.p12
 *.DS_Store
+netop_playgroud/*

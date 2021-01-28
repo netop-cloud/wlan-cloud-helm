@@ -327,8 +327,8 @@ metrics:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8080"
 creds:
-  sslKeystorePassword: DUMMY_PASSWORD
-  sslTruststorePassword: DUMMY_PASSWORD
+  sslKeystorePassword: mypassword
+  sslTruststorePassword: mypassword
 
 cassandra:
   url: cassandra-headless
