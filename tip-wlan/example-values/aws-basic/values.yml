@@ -4,15 +4,22 @@ shared:
       kubernetes.io/ingress.class: alb
       alb.ingress.kubernetes.io/scheme: internet-facing
       alb.ingress.kubernetes.io/group.name: wlan-cloudsdk
-      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-central-1:0123456789:certificate/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-central-1:139170499970:certificate/31be5e68-0d35-49a1-b36c-712cc30eb550"
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
       alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_302"}}'
 
 # Annotations for namespace
-annotations: {
-    "helm.sh/resource-policy": keep
-}
+annotations: { "helm.sh/resource-policy": keep }
 dockerRegistrySecret: ewoJImF1dGhzIjogewoJCSJ0aXAtdGlwLXdsYW4tY2xvdWQtZG9ja2VyLXJlcG8uamZyb2cuaW8iOiB7CgkJCSJhdXRoIjogImRHbHdMWEpsWVdRNmRHbHdMWEpsWVdRPSIKCQl9Cgl9LAoJIkh0dHBIZWFkZXJzIjogewoJCSJVc2VyLUFnZW50IjogIkRvY2tlci1DbGllbnQvMTkuMDMuOCAobGludXgpIgoJfQp9
+
+common:
+  efs-provisioner:
+    enabled: true
+    provisioner:
+      efsFileSystemId: fs-237ed378
+      awsRegion: eu-central-1
+      efsDnsName: fs-237ed378.efs.eu-central-1.amazonaws.com
+      storageClass: aws-efs
 
 opensync-gw-static:
   enabled: false
@@ -21,13 +28,13 @@ opensync-gw-cloud:
   service:
     type: LoadBalancer
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: opensync-controller.cloudsdk.lab.wlan.tip.build,opensync-redirector.cloudsdk.lab.wlan.tip.build
+      external-dns.alpha.kubernetes.io/hostname: opensync-controller.cloudsdk.tip.net-bot.com,opensync-redirector.cloudsdk.tip.net-bot.com
       service.beta.kubernetes.io/aws-load-balancer-type: "nlb-ip"
   enabled: true
   externalhost:
     address:
-      ovsdb: opensync-controller.cloudsdk.lab.wlan.tip.build
-      mqtt: opensync-mqtt-broker.cloudsdk.lab.wlan.tip.build
+      ovsdb: opensync-controller.cloudsdk.tip.net-bot.com
+      mqtt: opensync-mqtt-broker.cloudsdk.tip.net-bot.com
   persistence:
     enabled: false
   image:
@@ -37,7 +44,7 @@ opensync-mqtt-broker:
   service:
     type: LoadBalancer
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: opensync-mqtt-broker.cloudsdk.lab.wlan.tip.build
+      external-dns.alpha.kubernetes.io/hostname: opensync-mqtt-broker.cloudsdk.tip.net-bot.com
       service.beta.kubernetes.io/aws-load-balancer-type: "nlb-ip"
   enabled: true
   persistence:
@@ -52,17 +59,15 @@ wlan-cloud-graphql-gw:
     enabled: true
     alb_https_redirect: true
     hosts:
-    - host: wlan-graphql.cloudsdk.lab.wlan.tip.build
-      paths: [
-        /*
-        ]
+      - host: wlan-graphql.cloudsdk.tip.net-bot.com
+        paths: [/*]
   env:
-    portalsvc: wlan-portal-svc.cloudsdk.lab.wlan.tip.build
+    portalsvc: wlan-portal-svc.cloudsdk.tip.net-bot.com
 
 wlan-cloud-static-portal:
   enabled: true
   env:
-    graphql: https://wlan-graphql.cloudsdk.lab.wlan.tip.build
+    graphql: https://wlan-graphql.cloudsdk.tip.net-bot.com
   service:
     type: NodePort
   ingress:
@@ -70,10 +75,8 @@ wlan-cloud-static-portal:
       <<: *srv-https-annotations
     alb_https_redirect: true
     hosts:
-      - host: wlan-ui.cloudsdk.lab.wlan.tip.build
-        paths: [
-           /*
-          ]
+      - host: wlan-ui.cloudsdk.tip.net-bot.com
+        paths: [/*]
 wlan-portal-service:
   service:
     type: NodePort
@@ -81,9 +84,11 @@ wlan-portal-service:
   enabled: true
   persistence:
     enabled: true
-    storageClass: gp2
+    storageClass: aws-efs
+    filestoreSize: 10Gi
+    # storageClass: gp2
   tsp:
-    host: wlan-portal-svc.cloudsdk.lab.wlan.tip.build
+    host: wlan-portal-svc.cloudsdk.tip.net-bot.com
   ingress:
     enabled: true
     alb_https_redirect: true
@@ -95,10 +100,8 @@ wlan-portal-service:
       alb.ingress.kubernetes.io/healthcheck-port: traffic-port
       alb.ingress.kubernetes.io/healthcheck-path: /ping
     hosts:
-      - host: wlan-portal-svc.cloudsdk.lab.wlan.tip.build
-        paths: [
-           /*
-          ]
+      - host: wlan-portal-svc.cloudsdk.tip.net-bot.com
+        paths: [/*]
 
 wlan-prov-service:
   enabled: true
